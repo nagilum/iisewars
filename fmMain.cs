@@ -51,7 +51,20 @@ namespace iisewars {
 				return;
 			}
 
-			// Get localhost IP.
+			this.tbSolutionFile.Enabled = false;
+			this.btSolutionFile.Enabled = false;
+			this.btGo.Enabled = false;
+
+			this.lbSearchingForVS.Visible = true;
+			this.lbStep1.Visible = false;
+			this.lbStep2.Visible = false;
+			this.lbStep3.Visible = false;
+			this.lbStep4.Visible = false;
+
+			Application.DoEvents();
+
+			#region Get localhost IP.
+
 			var ipAddress = string.Empty;
 
 			foreach (var ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
@@ -68,12 +81,15 @@ namespace iisewars {
 				return;
 			}
 
-			// Get WebApp port.
+			#endregion
+			#region Get webapp port.
+
 			var assemblyName = string.Empty;
 			var webAppPort = 0;
 			var solutionLines = File.ReadAllLines(this.tbSolutionFile.Text.Trim());
 			var projects = new List<string>();
 			var path = this.tbSolutionFile.Text.Trim();
+			var visualStudioVersion = string.Empty;
 
 			path = path.Substring(0, path.LastIndexOf(@"\", StringComparison.InvariantCultureIgnoreCase));
 
@@ -90,6 +106,12 @@ namespace iisewars {
 						path,
 						filename));
 			}
+
+			foreach (var line in solutionLines)
+				if (line.StartsWith("VisualStudioVersion"))
+					visualStudioVersion = line
+						.Substring(line.IndexOf("=", StringComparison.InvariantCultureIgnoreCase) + 1)
+						.Trim();
 
 			foreach (var pathname in projects) {
 				var projectLines = File.ReadAllLines(pathname);
@@ -130,7 +152,77 @@ namespace iisewars {
 				return;
 			}
 
-			// Step 1: Configure IIS Express with Local IP.
+			#endregion
+			#region Find correct Visual Studio executable.
+
+			if (visualStudioVersion.Contains("."))
+				visualStudioVersion = visualStudioVersion.Substring(0, visualStudioVersion.IndexOf('.'));
+
+			var devenvExecutable = string.Empty;
+			var pfx64 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+			var pfx86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+			var files = new List<string>();
+			var folders = new List<string>();
+			var findex = 0;
+
+			if (!string.IsNullOrWhiteSpace(pfx64) &&
+				Directory.Exists(pfx64))
+				folders.Add(pfx64);
+
+			if (!string.IsNullOrWhiteSpace(pfx86) &&
+				Directory.Exists(pfx86))
+				folders.Add(pfx86);
+
+			while (true) {
+				try {
+					folders.AddRange(
+						Directory.GetDirectories(
+							folders[findex],
+							"*",
+							SearchOption.TopDirectoryOnly));
+				}
+				catch {
+					// ignore
+				}
+
+				try {
+					files.AddRange(
+						Directory.GetFiles(
+							folders[findex],
+							"devenv.exe",
+							SearchOption.TopDirectoryOnly));
+				}
+				catch {
+					// ignore
+				}
+
+				findex++;
+
+				if (findex == folders.Count)
+					break;
+			}
+
+			foreach (var file in files) {
+				if (file.IndexOf(string.Format("Microsoft Visual Studio {0}.0", visualStudioVersion),
+					StringComparison.InvariantCultureIgnoreCase) <= -1)
+					continue;
+
+				devenvExecutable = file;
+				break;
+			}
+
+			#endregion
+
+			this.lbSearchingForVS.Visible = false;
+			this.lbStep1.Visible = true;
+			this.lbStep2.Visible = true;
+			this.lbStep3.Visible = true;
+			this.lbStep4.Visible = true;
+
+			Application.DoEvents();
+
+			#region Step 1: Configure IIS Express with Local IP.
+
 			var outputLines = new List<string>();
 			var configFile = string.Format(
 				"{0}\\IISExpress\\config\\applicationhost.config",
@@ -170,7 +262,9 @@ namespace iisewars {
 			Application.DoEvents();
 			Thread.Sleep(100);
 
-			// Step 2: Enable Access to the URL for All Users.
+			#endregion
+			#region Step 2: Enable Access to the URL for All Users.
+
 			try {
 				Process.Start(
 					new ProcessStartInfo {
@@ -196,7 +290,9 @@ namespace iisewars {
 			Application.DoEvents();
 			Thread.Sleep(100);
 
-			// Step 3: Open the Port in Windows Firewall.
+			#endregion
+			#region Step 3: Open the Port in Windows Firewall.
+
 			try {
 				var fwMgrType = Type.GetTypeFromProgID("HNetCfg.FwMgr", false);
 				var fwMgr = (INetFwMgr) Activator.CreateInstance(fwMgrType);
@@ -230,6 +326,42 @@ namespace iisewars {
 
 			this.pbStep3.Visible = true;
 			this.lbStep3.ForeColor = SystemColors.ControlText;
+
+			Application.DoEvents();
+			Thread.Sleep(100);
+
+			#endregion
+			#region Step 4: Run Solution in Visual Studio as Admin.
+
+			if (!string.IsNullOrWhiteSpace(devenvExecutable) &&
+			    File.Exists(devenvExecutable)) {
+				try {
+					Process.Start(
+						new ProcessStartInfo {
+							FileName = devenvExecutable,
+							Arguments = this.tbSolutionFile.Text.Trim(),
+							Verb = "runas"
+						});
+				}
+				catch (Exception ex) {
+					MessageBox.Show(
+						ex.Message,
+						"Error",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error);
+
+					return;
+				}
+
+				this.pbStep4.Visible = true;
+				this.lbStep4.ForeColor = SystemColors.ControlText;
+			}
+
+			#endregion
+
+			this.tbSolutionFile.Enabled = true;
+			this.btSolutionFile.Enabled = true;
+			this.btGo.Enabled = true;
 		}
 	}
 }

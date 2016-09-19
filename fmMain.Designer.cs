@@ -34,9 +34,13 @@
 			this.pbStep1 = new System.Windows.Forms.PictureBox();
 			this.pbStep2 = new System.Windows.Forms.PictureBox();
 			this.pbStep3 = new System.Windows.Forms.PictureBox();
+			this.pbStep4 = new System.Windows.Forms.PictureBox();
+			this.lbStep4 = new System.Windows.Forms.Label();
+			this.lbSearchingForVS = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.pbStep1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbStep2)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbStep3)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbStep4)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -142,11 +146,44 @@
 			this.pbStep3.TabStop = false;
 			this.pbStep3.Visible = false;
 			// 
+			// pbStep4
+			// 
+			this.pbStep4.Image = global::iisewars.Properties.Resources.check_icon;
+			this.pbStep4.Location = new System.Drawing.Point(22, 135);
+			this.pbStep4.Name = "pbStep4";
+			this.pbStep4.Size = new System.Drawing.Size(16, 16);
+			this.pbStep4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+			this.pbStep4.TabIndex = 12;
+			this.pbStep4.TabStop = false;
+			this.pbStep4.Visible = false;
+			// 
+			// lbStep4
+			// 
+			this.lbStep4.AutoSize = true;
+			this.lbStep4.ForeColor = System.Drawing.SystemColors.ControlDark;
+			this.lbStep4.Location = new System.Drawing.Point(44, 137);
+			this.lbStep4.Name = "lbStep4";
+			this.lbStep4.Size = new System.Drawing.Size(189, 13);
+			this.lbStep4.TabIndex = 11;
+			this.lbStep4.Text = "Run Solution in Visual Studio as Admin";
+			// 
+			// lbSearchingForVS
+			// 
+			this.lbSearchingForVS.Location = new System.Drawing.Point(12, 94);
+			this.lbSearchingForVS.Name = "lbSearchingForVS";
+			this.lbSearchingForVS.Size = new System.Drawing.Size(411, 21);
+			this.lbSearchingForVS.TabIndex = 13;
+			this.lbSearchingForVS.Text = "Searching for Visual Studio...";
+			this.lbSearchingForVS.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.lbSearchingForVS.Visible = false;
+			// 
 			// fmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(435, 151);
+			this.ClientSize = new System.Drawing.Size(435, 176);
+			this.Controls.Add(this.pbStep4);
+			this.Controls.Add(this.lbStep4);
 			this.Controls.Add(this.pbStep3);
 			this.Controls.Add(this.pbStep2);
 			this.Controls.Add(this.pbStep1);
@@ -157,6 +194,7 @@
 			this.Controls.Add(this.btSolutionFile);
 			this.Controls.Add(this.tbSolutionFile);
 			this.Controls.Add(this.label1);
+			this.Controls.Add(this.lbSearchingForVS);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
@@ -167,6 +205,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.pbStep1)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbStep2)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbStep3)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbStep4)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -184,6 +223,9 @@
 		private System.Windows.Forms.PictureBox pbStep1;
 		private System.Windows.Forms.PictureBox pbStep2;
 		private System.Windows.Forms.PictureBox pbStep3;
+		private System.Windows.Forms.PictureBox pbStep4;
+		private System.Windows.Forms.Label lbStep4;
+		private System.Windows.Forms.Label lbSearchingForVS;
 	}
 }
 
